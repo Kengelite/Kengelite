@@ -1,0 +1,2 @@
+npm install mysql --save
+npm run serve

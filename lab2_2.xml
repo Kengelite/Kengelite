@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.mydomain.org/">
+    <rdf:Description
+        rdf:about="http://www.mydomain.org/IMG0001"
+        xmlns:dc="http://www.mydomain.org/dc#">
+        <rdf:type
+            rdf:resource="http://www.mydomain.org/#Image" />
+        <dc:title>Ubonrat Dam</dc:title>
+        <dc:description>Ubonrat Dam is the largest multi
+            purpose dam in the Northeast.
+            The dam is across the Phong
+            river at the pass connecting Phu-
+            kao and Phu Phan mountains</dc:description>
+        <developBy rdf:resource="http://www.mydomain.org/#Au0001" />
+        <dc:format>jpeg</dc:format>
+        <fileSize>28 kb</fileSize>
+        <resolution>284 x 215 pixel</resolution>
+    </rdf:Description>
+    <Author rdf:ID="Au0001"
+        xml:base="http://www.mydomain.org/">
+        <firstName>Somsak</firstName>
+        <lastName>Sandee</lastName>
+        <address>Khon Kaen Province</address>
+        <email>somsak@hotmail.com</email>
+    </Author>
+</rdf:RDF>

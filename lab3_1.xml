@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xml:base="http://www.myUniversity.com/">
+    <rdfs:Class rdf:ID="Department">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="Staff">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="Course">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="AcademicStaff">
+        <rdfs:subClassOf rdf:resource="#Staff" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="Professor">
+        <rdfs:subClassOf rdf:resource="#AcademicStaff" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="AssociateProfessor">
+        <rdfs:subClassOf rdf:resource="#AcademicStaff" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="AssistantProfessor">
+        <rdfs:subClassOf rdf:resource="#AcademicStaff" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="BsCourse">
+        <rdfs:subClassOf rdf:resource="#Course" />
+    </rdfs:Class>
+    <rdfs:Class rdf:ID="MsCourse">
+        <rdfs:subClassOf rdf:resource="#Course" />
+    </rdfs:Class>
+    <rdf:Property
+        rdf:about="#name">
+        <rdfs:domain rdf:resource="#Department" />
+        <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal" />
+    </rdf:Property>
+    <rdf:Property
+        rdf:about="#workIn">
+        <rdfs:domain rdf:resource="#Staff" />
+        <rdfs:range rdf:resource="#Department" />
+    </rdf:Property>
+    <rdf:Property
+        rdf:about="#name">
+        <rdfs:domain rdf:resource="#Staff" />
+        <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal" />
+    </rdf:Property>
+    <rdf:Property
+        rdf:about="#address">
+        <rdfs:domain rdf:resource="#Staff" />
+        <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal" />
+    </rdf:Property>
+    <rdf:Property
+        rdf:about="#teaches">
+        <rdfs:domain rdf:resource="#AcademicStaff" />
+        <rdfs:range rdf:resource="#Course" />
+    </rdf:Property>
+    <rdf:Property
+        rdf:about="#name">
+        <rdfs:domain rdf:resource="#Course" />
+        <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal" />
+    </rdf:Property>
+    <rdf:Property
+        rdf:about="#credit">
+        <rdfs:domain rdf:resource="#credit" />
+        <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal" />
+    </rdf:Property>
+    <rdf:Property
+        rdf:about="#homepage">
+        <rdfs:domain rdf:resource="#Course" />
+        <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal" />
+    </rdf:Property>
+
+</rdf:RDF>
