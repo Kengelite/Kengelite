@@ -7,6 +7,7 @@ const mqtt = require('mqtt');
 app.use(bodyParser.json());
 const axios = require('axios');
 const querystring = require('querystring');
+const healthcheck = require('express-healthcheck');
 
 const serviceAccount = require('./projectjop-86653-firebase-adminsdk-riay7-b1a0545395.json');
 admin.initializeApp({
@@ -32,6 +33,7 @@ const db_fb = admin.database();
 const mysql = require('mysql2/promise');
 const brokerUrl = 'mqtt://20.51.151.48'; // URL ของ Mosquitto broker
 const client = mqtt.connect(brokerUrl);
+
 
 // เมื่อเชื่อมต่อกับ broker สำเร็จ
 client.on('connect', () => {
@@ -109,7 +111,7 @@ app.get('/test_mqttf', (req, res) => {
 
 // const mysql = require('mysql');
 // ******************************************************************************
-
+app.use('/health', healthcheck());
 app.get('/add_fb', (req, res) => {
   db_fb.ref('/credit_balance').set(10).then(() => {
     res.status(200).json({ 'success': true, 'message': 'insert data successs' });
