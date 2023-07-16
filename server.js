@@ -367,7 +367,10 @@ app.post('/create_qrcode_payment', async (req, res) => {
 
 app.get('/customer', async (req, res) => {
   try {
-    const [results] = await db.query(`select * from customer where username = 'aaa@aa'`);
+    const connection = await db.getConnection();
+    const [results, fields] = await connection.query(`select * from customer where username = 'aaa@aa'`);
+    connection.release();
+    // const [results] = await db.query(`select * from customer where username = 'aaa@aa'`);
     res.send(results[0]);
   } catch (error) {
     console.error(error);
