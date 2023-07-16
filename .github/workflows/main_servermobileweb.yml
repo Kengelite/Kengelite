@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'servermobileweb'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3DB450F7977B4896A4573EE65567AB10 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D9A110395EB44258A536F80AD74986DE }}
           package: .
