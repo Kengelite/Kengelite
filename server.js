@@ -121,12 +121,15 @@ app.get('/add_fb', (req, res) => {
 })
 
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: 'projectmysql.mysql.database.azure.com',
   user: 'apipathadmin',
   password: '0988709784k+',
   database: 'projectp_success',
-  port: '3306'
+  port: '3306',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 app.get('/', (req, res) => {
