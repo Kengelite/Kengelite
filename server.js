@@ -126,7 +126,10 @@ const db = mysql.createPool({
   user: 'apipathadmin',
   password: '0988709784k+',
   database: 'projectp_success',
-  port: '3306'
+  port: '3306',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 app.get('/', (req, res) => {
