@@ -134,6 +134,8 @@ app.get('/', (req, res) => {
   })
 })
 
+
+
 app.post('/mosmqtt', (req, res) => {
   res.status(200).json({ 'success': true, 'message': 'insert data successs' });
   client.publish('WashCar/kkn/box1', req.body.mqtt);
