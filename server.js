@@ -15,6 +15,8 @@ admin.initializeApp({
   databaseURL: 'https://projectjop-86653-default-rtdb.asia-southeast1.firebasedatabase.app'
 });
 
+
+
 const db_fb = admin.database();
 
 // const client = mqtt.connect('mqtt://20.51.151.48', {
