@@ -637,16 +637,16 @@ app.post('/add_use_washcar', async (req, res) => {
           db_fb.ref('/credit_wind').set(use_credit[0].credit_wind).then(() => {
             res.send({ ok: true, data: results_insert });
           }).catch((error) => {
-            console.error('Error:', error);
+            console.error('Error1:', error);
           });
         }).catch((error) => {
-          console.error('Error:', error);
+          console.error('Error2:', error);
         });
       }).catch((error) => {
-        console.error('Error:', error);
+        console.error('Error3:', error);
       });
     }).catch((error) => {
-      console.error('Error:', error);
+      console.error('Error4:', error);
     });
 
   } catch (error) {
