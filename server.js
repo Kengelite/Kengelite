@@ -128,7 +128,6 @@ const db = mysql.createPool({
   database: 'LAB_DB',
   port: '3306',
   waitForConnections: true,
-  connectionLimit: 10,
   queueLimit: 0
 });
 
@@ -292,16 +291,16 @@ app.post('/create_qrcode_payment', async (req, res) => {
                         responseData.txn.totalAmount,
                         responseData.txn.status,
                         responseData.txn.gbpReferenceNo,
-                        ( parseInt(responseData.txn.totalAmount) * 0.05 ).toFixed(2)  ,
+                        (parseInt(responseData.txn.totalAmount) * 0.05).toFixed(2),
                         responseData.txn.paymentType,
                         req.body.username
                       ]);
-                      //  ดึงข้อมูลลูกค้ามาบวกค่าใหม่
-                    const [results_customer_update] = await db.query(`select * from customer where username = ?` ,req.body.username);
-                    let money_customer =  parseInt(results_customer_update[0].money) + parseInt(responseData.txn.totalAmount) 
+                    //  ดึงข้อมูลลูกค้ามาบวกค่าใหม่
+                    const [results_customer_update] = await db.query(`select * from customer where username = ?`, req.body.username);
+                    let money_customer = parseInt(results_customer_update[0].money) + parseInt(responseData.txn.totalAmount)
                     // บวกคะแนนพ้อย
                     console.log(money_customer);
-                    let point_customer =   parseFloat(results_customer_update[0].point) +  ( parseFloat(responseData.txn.totalAmount) * 0.05 ) 
+                    let point_customer = parseFloat(results_customer_update[0].point) + (parseFloat(responseData.txn.totalAmount) * 0.05)
                     console.log(point_customer);
                     await db.query(`UPDATE  customer SET  money = ? , point = ?
                     WHERE  username = ?`,
@@ -607,7 +606,82 @@ app.post('/branch_data_car', async (req, res) => {
     res.status(500).json({ 'success': false, 'message': 'Internal server error' });
   }
 })
+
+
+
+
+app.post('/add_use_washcar', async (req, res) => {
+
+  try {
+
+
+    const [results_credit] = await db.query(`select * from credit where  status = 1  `);
+
+    let total_credit = results_credit[0].credit_point * req.body.price
+
+    let total_point = results_credit[0].point * req.body.price
+
+    const [results_insert] = await db.query(`
+      INSERT INTO use_car_wash(  price, credit,  id_promo, point, email_cus, idcar_wash,id_credit)
+       VALUES (?,?,?,?,?,?,?)
+      `, [
+      req.body.price, total_credit, req.body.id_promo,
+      total_point, req.body.email_cus, req.body.idcar_wash, results_credit[0].id
+    ]);
+    db_fb.ref('/credit_balance').set(total_credit).then(() => {
+      res.send({ ok: true, data: results_insert });
+    }).catch((error) => {
+      console.error('Error:', error);
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ ok: false, data: results });
+  }
+
+
+
+});
+
+// ALTER TABLE Persons
+// ALTER City SET DEFAULT 'Sandnes';
+
+
+
+
+app.post('/dddd', async (req, res) => {
+
+  try {
+
+    const [results_alter] = await db.query(`
+      ALTER TABLE use_car_wash
+      ALTER credit SET DEFAULT '1' `,
+      req.body);
+
+    // const [results] = await db.query(`select * from customer where  username = ?  and delete_time IS NULL`,
+    //   [req.body.username]);
+    res.send({ ok: true, data: results_alter });
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ ok: false, data: results });
+  }
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
 app.listen(3000, () => {
   console.log('Server listening on port 4000');
 });
-
