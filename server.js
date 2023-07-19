@@ -620,7 +620,7 @@ app.post('/add_use_washcar', async (req, res) => {
     let total_credit = results_credit[0].credit_point * req.body.price
 
     let total_point = results_credit[0].point * req.body.price
-
+    console.log(results_credit)
     const [results_insert] = await db.query(`
       INSERT INTO use_car_wash(  price, credit,  id_promo, point, email_cus, idcar_wash,id_credit)
        VALUES (?,?,?,?,?,?,?)
@@ -628,6 +628,7 @@ app.post('/add_use_washcar', async (req, res) => {
       req.body.price, total_credit, req.body.id_promo,
       total_point, req.body.email_cus, req.body.idcar_wash, results_credit[0].id
     ]);
+    console.log(results_insert)
     db_fb.ref('/credit_balance').set(total_credit).then(() => {
       res.send({ ok: true, data: results_insert });
     }).catch((error) => {
