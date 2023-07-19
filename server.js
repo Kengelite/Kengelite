@@ -629,7 +629,7 @@ app.post('/add_use_washcar', async (req, res) => {
       total_point, req.body.email_cus, req.body.idcar_wash, results_credit[0].id
     ]);
     console.log(results_insert)
-    const [use_credit] = await db.query(`select * from credit_car_wash where  credit_car_wash.id_credit = (select * from use_car_wash where use_car_wash.id_credit  = ?)) `, [results_credit[0].id]);
+    const [use_credit] = await db.query(`select * from credit_car_wash where  credit_car_wash.id_credit in (select id_credit from use_car_wash where use_car_wash.id_usecar  = ?) `, [results_insert.insertId]);
 
     db_fb.ref('/credit_balance').set(total_credit).then(() => {
       db_fb.ref('/credit_foam').set(use_credit[0].credit_foam).then(() => {
@@ -651,7 +651,7 @@ app.post('/add_use_washcar', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send({ ok: false, data: results });
+    res.status(500).send({ ok: false});
   }
 
 
