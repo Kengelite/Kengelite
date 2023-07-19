@@ -616,11 +616,11 @@ app.post('/add_use_washcar', async (req, res) => {
 
 
     const [results_credit] = await db.query(`select * from credit where  status = 1  `);
+    const [results_customer] = await db.query(`select * from customer where  username =  ? `,[req.body.email_cus]);
 
     let total_credit = results_credit[0].credit_point * req.body.price
 
     let total_point = results_credit[0].point * req.body.price
-    console.log(results_credit)
     const [results_insert] = await db.query(`
       INSERT INTO use_car_wash(  price, credit,  id_promo, point, email_cus, idcar_wash,id_credit)
        VALUES (?,?,?,?,?,?,?)
@@ -628,9 +628,10 @@ app.post('/add_use_washcar', async (req, res) => {
       req.body.price, total_credit, req.body.id_promo,
       total_point, req.body.email_cus, req.body.idcar_wash, results_credit[0].id
     ]);
-    console.log(results_insert)
-    const [use_credit] = await db.query(`select * from credit_car_wash where  credit_car_wash.id_credit in (select id_credit from use_car_wash where use_car_wash.id_usecar  = ?) `, [results_insert.insertId]);
 
+    const [use_credit] = await db.query(`select * from credit_car_wash where  credit_car_wash.id_credit in (select id_credit from use_car_wash where use_car_wash.id_usecar  = ?) `, [results_insert.insertId]);
+    const [results_rpdate_customer] = await db.query(`UPDATE customer SET money= ? ,point= ?  WHERE username =   ? ` ,
+     [(results_customer[0].money-req.body.price), (parseFloat(results_customer[0].point)+parseFloat(total_point)),req.body.email_cus]);
     db_fb.ref('/credit_balance').set(total_credit).then(() => {
       db_fb.ref('/credit_foam').set(use_credit[0].credit_foam).then(() => {
         db_fb.ref('/credit_water').set(use_credit[0].credit_water).then(() => {
@@ -651,7 +652,7 @@ app.post('/add_use_washcar', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send({ ok: false});
+    res.status(500).send({ ok: false });
   }
 
 
