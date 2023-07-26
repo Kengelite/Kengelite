@@ -695,7 +695,10 @@ app.post('/dddd', async (req, res) => {
 
 
 
-
+app.post('/mosmqtt_oil', (req, res) => {
+  res.status(200).json({ 'success': true, 'message': 'insert data successs' });
+  client.publish('mosmqtt_oil', req.body.mqtt);
+})
 
 
 app.listen(3000, () => {
