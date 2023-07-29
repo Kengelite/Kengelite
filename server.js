@@ -474,7 +474,7 @@ app.put('/editCustomer', async (req, res) => {
 app.post('/data_usecar', async (req, res) => {
 
   try {
-    const [results] = await db.query(`select * from use_car_wash where email_cus  = ?  and delete_time IS NULL`, [req.body.username]);
+    const [results] = await db.query(`select * from use_car_wash where email_cus  = ?  and delete_time IS NULL ORDER BY date_time DESC`, [req.body.username]);
     if (results.length == 0) {
       res.send({ ok: false, data: results });
     } else {
@@ -701,6 +701,11 @@ app.post('/mosmqtt_oil', (req, res) => {
  
 })
 
+app.post('/mosmqtt_oil_att', (req, res) => {
+  client.publish('mosmqtt_oil', req.body.mqtt);
+  res.status(200).json({ 'success': true, 'message': 'insert data successs' });
+ 
+})
 
 app.listen(3000, () => {
   console.log('Server listening on port 4000');
