@@ -474,7 +474,7 @@ app.put('/editCustomer', async (req, res) => {
 app.post('/data_usecar', async (req, res) => {
 
   try {
-    const [results] = await db.query(`select * from use_car_wash where email_cus  = ?  and delete_time IS NULL ORDER BY date_time DESC`, [req.body.username]);
+    const [results] = await db.query(`select * from use_car_wash where email_cus  = ?  and delete_time IS NULL ORDER BY create_time DESC`, [req.body.username]);
     if (results.length == 0) {
       res.send({ ok: false, data: results });
     } else {
