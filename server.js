@@ -43,9 +43,12 @@ client.on('connect', () => {
   client.subscribe('WashCar/kkn/box1');
   client.subscribe('WashCar/kkn/box1/backmsg');
 });
-client.on('message', (topic, message) => {
-  console.log(`Received message on topic ${topic}: ${message.toString()}`);
-});
+// client.on('message', (topic, message) => {
+//   if(message.toString() == "out_of_time" ){
+//     console.log("หมดเวลา")
+//   }
+//   console.log(`Received message on topic ${topic}: ${message.toString()}`);
+// });
 
 // ทำการ publish ข้อความไปยัง topic ที่ต้องการ
 
