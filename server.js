@@ -333,7 +333,7 @@ app.post('/create_qrcode_payment', async (req, res) => {
             if (Date.now() - startTime >= 10 * 30 * 1000) {
               clearInterval(interval); // หยุดการทำงานซ้ำ
               const responseData = await fetchData(); // ดึงข้อมูลที่ต้องการ
-              res.send(responseData); // ส่งข้อมูลกลับไปยัง client
+              // res.send(responseData); // ส่งข้อมูลกลับไปยัง client
             }
             // ทำการเช็คทุก 10 วินาที 
           }, 1 * 10 * 1000); // 1 นาที (60 วินาที)
@@ -346,21 +346,21 @@ app.post('/create_qrcode_payment', async (req, res) => {
             setTimeout(resolve, 5 * 60 * 1000); // 5 นาที (300 วินาที)  = 
           });
           clearInterval(interval); // หยุดการทำงานซ้ำ
-          res.sendStatus(200); // ส่งสถานะการตอบกลับ 200 OK
+          // res.sendStatus(200); // ส่งสถานะการตอบกลับ 200 OK
         } catch (error) {
           console.error(error);
-          res.status(500).json({ error: 'Internal server error' });
+          // res.sendStatus(200);
         }
       })
       .catch(error => {
         console.error(error);
-        res.status(500).send('Internal Server Error');
+        // res.sendStatus(200);
       });
 
     // });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.sendStatus(200);
   }
 });
 
@@ -392,7 +392,7 @@ app.post('/check_customer', async (req, res) => {
   //       res.send({ ok: true, data: results });
   //     }
   //   }
-
+  console.log(req.body.username)
   try {
     const [results] = await db.query(`select * from customer where  username = ?  and password = ? and delete_time IS NULL`, [req.body.username, req.body.password]);
     if (results.length == 0) {
@@ -600,7 +600,9 @@ app.post('/branch_location', async (req, res) => {
 app.post('/branch_data_car', async (req, res) => {
   console.log(req.body.branch_id)
   try {
-    const [results] = await db.query(`SELECT * FROM car_wash WHERE branch_id = ?`, [req.body.branch_id]);
+    const [results] = await db.query(`SELECT * FROM car_wash 
+    left join branch on car_wash.branch_id = branch.id_branch
+    WHERE branch_id = ?`, [req.body.branch_id]);
     // res.send(results);
     res.status(200).json({ 'success': true, results: results });
 
