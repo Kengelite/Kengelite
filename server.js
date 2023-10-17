@@ -31,7 +31,7 @@ const db_fb = admin.database();
 //   client.subscribe('car_wash/box_car1');
 // });
 const mysql = require('mysql2/promise');
-const brokerUrl = 'mqtt://20.51.151.48'; // URL ของ Mosquitto broker
+const brokerUrl = 'mqtt://172.191.134.80'; // URL ของ Mosquitto broker
 const client = mqtt.connect(brokerUrl);
 
 
@@ -42,13 +42,19 @@ client.on('connect', () => {
   // ทำการ subscribe ไปยัง topic ที่ต้องการ
   client.subscribe('WashCar/kkn/box1');
   client.subscribe('WashCar/kkn/box1/backmsg');
+  client.subscribe('WashCar/kkn/box1/backid');
 });
-// client.on('message', (topic, message) => {
-//   if(message.toString() == "out_of_time" ){
-//     console.log("หมดเวลา")
-//   }
-//   console.log(`Received message on topic ${topic}: ${message.toString()}`);
-// });
+client.on('message', (topic, message) => {
+
+  // if(message.toString() == "" ){
+  //   console.log("หมดเวลา")
+  // }
+  if (topic === 'WashCar/kkn/box1/backmsg') {
+    console.log('Received message:', message.toString());
+    // ทำอย่างอื่น ๆ ที่คุณต้องการทำกับข้อมูลที่ได้รับ
+  }
+  console.log(`Received message on topic ${topic}: ${message.toString()}`);
+});
 
 // ทำการ publish ข้อความไปยัง topic ที่ต้องการ
 
@@ -56,8 +62,8 @@ client.on('connect', () => {
 ///ทดสอบ-*-----------------------------------------------------------------------------
 // เมื่อได้รับข้อมูลใหม่จาก HiveMQ broker
 // client.on('message', function (topic, message) {
-//   console.log('Received message:', topic.toString());
-//   if (topic === 'car_wash/status') {
+//   console.log('Received message d:', topic.toString());
+//   if (topic === 'WashCar/kkn/box1/backmsg') {
 //     console.log('Received message:', message.toString());
 //     // ทำอย่างอื่น ๆ ที่คุณต้องการทำกับข้อมูลที่ได้รับ
 //   }
@@ -142,12 +148,19 @@ app.get('/', (req, res) => {
 })
 
 
-
 app.post('/mosmqtt', (req, res) => {
   res.status(200).json({ 'success': true, 'message': 'insert data successs' });
   client.publish('WashCar/kkn/box1', req.body.mqtt);
 })
 
+
+
+
+app.post('/controller_box', (req, res) => {
+  console.log(req.body.control)
+  // res.status(200).json({ 'success': true, 'message': 'insert data successs' });
+  client.publish('WashCar/kkn/box1', req.body.control);
+})
 
 app.post('/testapi5', async (req, res) => {
   try {
@@ -546,10 +559,11 @@ app.post('/usersadd', async (req, res) => {
   try {
     const [results_check] = await db.query(`select * from customer where  username = ?  and delete_time IS NULL`,
       [req.body.username, req.body.password]);
+
     if (results_check.length == 0) {
       const [results_insert] = await db.query(`INSERT INTO customer SET ? `,
         req.body);
-
+      console.log(results_insert);
       const [results] = await db.query(`select * from customer where  username = ?  and delete_time IS NULL`,
         [req.body.username]);
       res.send({ ok: true, data: results });
@@ -585,10 +599,10 @@ app.post('/usersadd', async (req, res) => {
 app.post('/branch_location', async (req, res) => {
   console.log(req.body.longi, req.body.lati)
   try {
-    const [results] = await db.query(`SELECT *
+    const [results] = await db.query(`SELECT latitude,longitude,name_branch,id_branch
     FROM branch
     WHERE ST_Distance_Sphere(POINT(branch.longitude,branch.latitude), POINT(?,?)) < 5000 and id_branch != 0 `, [req.body.longi, req.body.lati]);
-    res.send(results);
+    res.status(200).json({ 'success': true, results: results });
     console.log(results)
   } catch (error) {
     console.error(error);
@@ -618,10 +632,9 @@ app.post('/branch_data_car', async (req, res) => {
 app.post('/add_use_washcar', async (req, res) => {
 
   try {
-
-
+    console.log(req.body.price)
     const [results_credit] = await db.query(`select * from credit where  status = 1  `);
-    const [results_customer] = await db.query(`select * from customer where  username =  ? `,[req.body.email_cus]);
+    const [results_customer] = await db.query(`select * from customer where  username =  ? `, [req.body.email_cus]);
 
     let total_credit = results_credit[0].credit_point * req.body.price
 
@@ -633,24 +646,25 @@ app.post('/add_use_washcar', async (req, res) => {
       req.body.price, total_credit, req.body.id_promo,
       total_point, req.body.email_cus, req.body.idcar_wash, results_credit[0].id
     ]);
-
+    // results_insert.insertId
     const [use_credit] = await db.query(`select * from credit_car_wash where  credit_car_wash.id_credit in (select id_credit from use_car_wash where use_car_wash.id_usecar  = ?) `, [results_insert.insertId]);
-    const [results_rpdate_customer] = await db.query(`UPDATE customer SET money= ? ,point= ?  WHERE username =   ? ` ,
-     [(results_customer[0].money-req.body.price), (parseFloat(results_customer[0].point)+parseFloat(total_point)),req.body.email_cus]);
+    const [results_rpdate_customer] = await db.query(`UPDATE customer SET money= ? ,point= ?  WHERE username =   ? `,
+      [(results_customer[0].money - req.body.price), (parseFloat(results_customer[0].point) + parseFloat(total_point)), req.body.email_cus]);
     db_fb.ref('/credit_balance').set(total_credit).then(() => {
-      db_fb.ref('/credit_foam').set(use_credit[0].credit_foam).then(() => {
-        db_fb.ref('/credit_water').set(use_credit[0].credit_water).then(() => {
-          db_fb.ref('/credit_wind').set(use_credit[0].credit_wind).then(() => {
-            res.send({ ok: true, data: results_insert });
-          }).catch((error) => {
-            console.error('Error1:', error);
-          });
-        }).catch((error) => {
-          console.error('Error2:', error);
-        });
-      }).catch((error) => {
-        console.error('Error3:', error);
-      });
+      res.send({ ok: true, data: results_insert });
+      // db_fb.ref('/credit_foam').set(use_credit[0].credit_foam).then(() => {
+      //   db_fb.ref('/credit_water').set(use_credit[0].credit_water).then(() => {
+      //     db_fb.ref('/credit_wind').set(use_credit[0].credit_wind).then(() => {
+      //       res.send({ ok: true, data: results_insert });
+      //     }).catch((error) => {
+      //       console.error('Error1:', error);
+      //     });
+      //   }).catch((error) => {
+      //     console.error('Error2:', error);
+      //   });
+      // }).catch((error) => {
+      //   console.error('Error3:', error);
+      // });
     }).catch((error) => {
       console.error('Error4:', error);
     });
@@ -663,6 +677,48 @@ app.post('/add_use_washcar', async (req, res) => {
 
 
 });
+
+
+
+app.post('/choise_time_return_data_promotion', async (req, res) => {
+
+  try {
+    const [results_id_branch] = await db.query(`
+    SELECT branch_id FROM car_wash  WHERE idcar_wash = ? `,
+      req.body.id_branch);
+    console.log(results_id_branch[0].branch_id)
+    const [results_promotion] = await db.query(`
+    SELECT promotion.*,type_promotion.name FROM promotion 
+    JOIN type_promotion ON promotion.type = type_promotion.id_type 
+    WHERE branch_id in (SELECT b_id
+      FROM (
+        SELECT promotion.id_promo, amount - COUNT(*) as total,promotion.branch_id as b_id
+        FROM use_car_wash
+        JOIN promotion ON use_car_wash.id_promo = promotion.id_promo
+        GROUP BY promotion.id_promo
+        HAVING total > 0 and b_id in(0,?)
+      ) AS subquery
+      )    ORDER BY price DESC LIMIT 3  `,
+      results_id_branch[0].branch_id);
+    console.log(results_promotion)
+    // const [results] = await db.query(`select * from customer where  username = ?  and delete_time IS NULL`,
+    //   [req.body.username]);
+    res.send({ ok: true, data: results_promotion });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ ok: false, data: results });
+  }
+
+
+
+});
+
+
+
+
+
+
+
 
 // ALTER TABLE Persons
 // ALTER City SET DEFAULT 'Sandnes';
@@ -703,13 +759,13 @@ app.post('/dddd', async (req, res) => {
 app.post('/mosmqtt_oil', (req, res) => {
   client.publish('mosmqtt_oil', req.body.mqtt);
   res.status(200).json({ 'success': true, 'message': 'insert data successs' });
- 
+
 })
 
 app.post('/mosmqtt_oil_att', (req, res) => {
   client.publish('mosmqtt_oil', req.body.mqtt);
   res.status(200).json({ 'success': true, 'message': 'insert data successs' });
- 
+
 })
 
 app.listen(3000, () => {

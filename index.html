@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        legend {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: auto auto;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="" name="myform" method="get">
+        <fieldset>
+            <legend> Employment Application </legend>
+            <div class="container">
+                <div>
+                    <div class="f1"  >
+                        <label for=""> which position are you applying for ? *</label>
+                        <br>
+                        <input type="number" required>
+                    </div>
+                    <label for=""> Are you willing to relocate ?</label> <br>
+                    <input type="radio" name="type" value="Yes" id=""> Yes <br>
+                    <input type="radio" name="type" value="No" id=""> No
+                    <br><br>
+                    <label for="">when can you start ? </label> <br>
+                    <input type="date" name="" id="">
+                    <br><br>
+                    <label for="">Portfolio web site </label> <br>
+                    <input type="url" name="" id="">
+                    <br><br>
+                    <label for="">Attach a copy of your Resume </label> <br>
+                    <input type="file" name="" id="">
+                </div>
+
+                <div>
+                    <h2>Your Contact Information</h2>
+                    <label for="">Name </label> <br>
+                    <input type="text" name="" id="" placeholder="ชื่อ">
+                    <input type="text" name="" id="" placeholder="นามสกุล"> <br>
+                    <br><br>
+                    <label for="">Email Address </label> <br>
+                    <input type="email" name="" id="">
+                    <br><br>
+                    <label for="">Phone </label> <br>
+                    <input type="tel" name="" id="">
+                    <br><br>
+                    <input type="submit" value="ส่งข้อมูล">
+                </div>
+            </div>
+            <br>
+
+        </fieldset>
+    </form>
+
+
+</body>
+
+</html>
