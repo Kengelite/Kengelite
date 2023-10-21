@@ -300,6 +300,7 @@ app.post('/create_qrcode_payment', async (req, res) => {
                 if (responseData.txn.status == 'S') {
                   clearInterval(interval);
                   try {
+               
                     await db.query(`INSERT INTO  payment (number_reference, total, status_payment, gbpReferenceNo, point_payment , type_payment, email_cus)
                     VALUES  (?,?,?,?,?,?,?)`,
                       [
@@ -313,7 +314,9 @@ app.post('/create_qrcode_payment', async (req, res) => {
                       ]);
                     //  ดึงข้อมูลลูกค้ามาบวกค่าใหม่
                     const [results_customer_update] = await db.query(`select * from customer where username = ?`, req.body.username);
-                    let money_customer = parseInt(results_customer_update[0].money) + parseInt(responseData.txn.totalAmount)
+                    // let money_customer = parseInt(results_customer_update[0].money) + parseInt(responseData.txn.totalAmount)
+                    const [results_credit] = await db.query(`select * from credit where  status = 1  `);
+                    let money_customer = parseInt(results_customer_update[0].money) + ( results_credit[0].credit_point * parseFloat(responseData.txn.totalAmount))
                     // บวกคะแนนพ้อย
                     console.log(money_customer);
                     let point_customer = parseFloat(results_customer_update[0].point) + (parseFloat(responseData.txn.totalAmount) * 0.05)
