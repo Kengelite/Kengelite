@@ -564,8 +564,8 @@ app.post('/usersadd', async (req, res) => {
       [req.body.username, req.body.password]);
 
     if (results_check.length == 0) {
-      const [results_insert] = await db.query(`INSERT INTO customer SET ? `,
-        req.body);
+      const [results_insert] = await db.query(`INSERT INTO customer(username,fname,lname,password,money,point,img,tel) VALUES (?,?,?,?,?,?,?,?) `,
+        [req.body.username,req.body.fname,req.body.lname,req.body.password,0,0,"images/profile_start.png",req.body.tel]);
       console.log(results_insert);
       const [results] = await db.query(`select * from customer where  username = ?  and delete_time IS NULL`,
         [req.body.username]);
@@ -574,7 +574,7 @@ app.post('/usersadd', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send({ ok: false, data: results });
+    res.status(500).send({ ok: false });
   }
 
 
@@ -638,7 +638,7 @@ app.post('/add_use_washcar', async (req, res) => {
     console.log(req.body.price)
     // const [results_credit] = await db.query(`select * from credit where  status = 1  `);
     const [results_customer] = await db.query(`select * from customer where  username =  ? `, [req.body.email_cus]);
-
+    console.log(results_customer[0].money)
     // let total_credit = results_credit[0].credit_point * req.body.price
 
     // let total_point = results_credit[0].point * req.body.price
@@ -653,8 +653,8 @@ app.post('/add_use_washcar', async (req, res) => {
     // const [use_credit] = await db.query(`select * from credit_car_wash where  credit_car_wash.id_credit in (select id_credit from use_car_wash where use_car_wash.id_usecar  = ?) `, [results_insert.insertId]);
     // const [results_rpdate_customer] = await db.query(`UPDATE customer SET money= ? ,point= ?  WHERE username =   ? `,
       // [(results_customer[0].money - req.body.price), (parseFloat(results_customer[0].point) + parseFloat(total_point)), req.body.email_cus]);
-    db_fb.ref('/credit_balance').set(total_credit[0].point).then(() => {
-      res.send({ ok: true, data: results_insert });
+    db_fb.ref('/credit_balance').set( parseFloat(results_customer[0].money)).then(() => {
+      res.send({ ok: true, data: results_customer });
       // db_fb.ref('/credit_foam').set(use_credit[0].credit_foam).then(() => {
       //   db_fb.ref('/credit_water').set(use_credit[0].credit_water).then(() => {
       //     db_fb.ref('/credit_wind').set(use_credit[0].credit_wind).then(() => {
