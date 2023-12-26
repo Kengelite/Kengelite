@@ -31,30 +31,30 @@ const db_fb = admin.database();
 //   client.subscribe('car_wash/box_car1');
 // });
 const mysql = require('mysql2/promise');
-const brokerUrl = 'mqtt://172.191.134.80'; // URL ของ Mosquitto broker
-const client = mqtt.connect(brokerUrl);
+// const brokerUrl = 'mqtt://172.191.134.80'; // URL ของ Mosquitto broker
+// const client = mqtt.connect(brokerUrl);
 
 
 // เมื่อเชื่อมต่อกับ broker สำเร็จ
-client.on('connect', () => {
-  console.log('Connected to Mosquitto broker');
+// client.on('connect', () => {
+//   console.log('Connected to Mosquitto broker');
 
-  // ทำการ subscribe ไปยัง topic ที่ต้องการ
-  client.subscribe('WashCar/kkn/box1');
-  client.subscribe('WashCar/kkn/box1/backmsg');
-  client.subscribe('WashCar/kkn/box1/backid');
-});
-client.on('message', (topic, message) => {
+//   // ทำการ subscribe ไปยัง topic ที่ต้องการ
+//   client.subscribe('WashCar/kkn/box1');
+//   client.subscribe('WashCar/kkn/box1/backmsg');
+//   client.subscribe('WashCar/kkn/box1/backid');
+// });
+// client.on('message', (topic, message) => {
 
-  // if(message.toString() == "" ){
-  //   console.log("หมดเวลา")
-  // }
-  if (topic === 'WashCar/kkn/box1/backmsg') {
-    console.log('Received message:', message.toString());
-    // ทำอย่างอื่น ๆ ที่คุณต้องการทำกับข้อมูลที่ได้รับ
-  }
-  console.log(`Received message on topic ${topic}: ${message.toString()}`);
-});
+//   // if(message.toString() == "" ){
+//   //   console.log("หมดเวลา")
+//   // }
+//   if (topic === 'WashCar/kkn/box1/backmsg') {
+//     console.log('Received message:', message.toString());
+//     // ทำอย่างอื่น ๆ ที่คุณต้องการทำกับข้อมูลที่ได้รับ
+//   }
+//   console.log(`Received message on topic ${topic}: ${message.toString()}`);
+// });
 
 // ทำการ publish ข้อความไปยัง topic ที่ต้องการ
 
@@ -148,19 +148,19 @@ app.get('/', (req, res) => {
 })
 
 
-app.post('/mosmqtt', (req, res) => {
-  res.status(200).json({ 'success': true, 'message': 'insert data successs' });
-  client.publish('WashCar/kkn/box1', req.body.mqtt);
-})
+// app.post('/mosmqtt', (req, res) => {
+//   res.status(200).json({ 'success': true, 'message': 'insert data successs' });
+//   client.publish('WashCar/kkn/box1', req.body.mqtt);
+// })
 
 
 
 
-app.post('/controller_box', (req, res) => {
-  console.log(req.body.control)
-  // res.status(200).json({ 'success': true, 'message': 'insert data successs' });
-  client.publish('WashCar/kkn/box1', req.body.control);
-})
+// app.post('/controller_box', (req, res) => {
+//   console.log(req.body.control)
+//   // res.status(200).json({ 'success': true, 'message': 'insert data successs' });
+//   client.publish('WashCar/kkn/box1', req.body.control);
+// })
 
 app.post('/testapi5', async (req, res) => {
   try {
@@ -570,6 +570,7 @@ app.post('/usersadd', async (req, res) => {
       const [results] = await db.query(`select * from customer where  username = ?  and delete_time IS NULL`,
         [req.body.username]);
       res.send({ ok: true, data: results });
+      
     }
 
   } catch (error) {
@@ -759,17 +760,17 @@ app.post('/dddd', async (req, res) => {
 
 
 
-app.post('/mosmqtt_oil', (req, res) => {
-  client.publish('mosmqtt_oil', req.body.mqtt);
-  res.status(200).json({ 'success': true, 'message': 'insert data successs' });
+// app.post('/mosmqtt_oil', (req, res) => {
+//   client.publish('mosmqtt_oil', req.body.mqtt);
+//   res.status(200).json({ 'success': true, 'message': 'insert data successs' });
 
-})
+// })
 
-app.post('/mosmqtt_oil_att', (req, res) => {
-  client.publish('mosmqtt_oil', req.body.mqtt);
-  res.status(200).json({ 'success': true, 'message': 'insert data successs' });
+// app.post('/mosmqtt_oil_att', (req, res) => {
+//   client.publish('mosmqtt_oil', req.body.mqtt);
+//   res.status(200).json({ 'success': true, 'message': 'insert data successs' });
 
-})
+// })
 
 app.listen(3000, () => {
   console.log('Server listening on port 4000');
