@@ -714,11 +714,13 @@ app.post('/add_use_washcar', async (req, res) => {
         console.log("Foam:", data_ref_foam);
         console.log("Water:", data_ref_water);
         if (results_carwash[0].status == 0 || data_ref_foam == 0 || data_ref_water == 0) {
-          res.send({ ok: false, txt: "box"  });
+          res.send({ ok: false, txt: "box" });
         } else {
           db_fb.ref(txt).set(parseFloat(results_customer[0].money) + parseFloat(req.body.credit_free)).then(() => {
             db_fb.ref("/box" + req.body.car_idname + "/new_state").set(1).then(() => {
+              console.log("sadsd")
               db_fb.ref("/box" + req.body.car_idname + "/working_now").set(0).then(() => {
+                console.log("sads44444d")
                 res.send({ ok: true, data: results_customer });
               }).catch((error) => {
                 res.send({ ok: false, txt: "box" });
@@ -834,7 +836,11 @@ app.post('/send_use_carwash', async (req, res) => {
         db_fb.ref("/box" + req.body.id_car + "/working_now").set(0).then(() => {
           db_fb.ref("/box" + req.body.id_car + "/working_state").set(0).then(() => {
             db_fb.ref("/box" + req.body.id_car + "/working_new").set(0).then(() => {
-              res.send({ ok: true });
+              db_fb.ref(txt).set(0).then(() => {
+                res.send({ ok: true });
+              }).catch((error) => {
+                console.error('Error:', error);
+              });
             }).catch((error) => {
               console.error('Error:', error);
             });
@@ -853,6 +859,7 @@ app.post('/send_use_carwash', async (req, res) => {
     res.status(500).send({ ok: false });
   }
 });
+
 
 app.post('/end_use_carwash', async (req, res) => {
   try {
