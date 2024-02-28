@@ -480,13 +480,13 @@ app.post('/check_customer', async (req, res) => {
 })
 
 app.post('/data_customer', async (req, res) => {
-
   try {
     const [results] = await db.query(`select * from customer where  username = ?  and delete_time IS NULL`, [req.body.username]);
+    const [results_credit_now] = await db.query(`select * from credit where delete_time IS NULL`,);
     if (results.length == 0) {
       res.send({ ok: false, data: results });
     } else {
-      res.send({ ok: true, data: results });
+      res.send({ ok: true, data: results, results_credit_now });
       console.log("ture")
     }
   } catch (error) {
@@ -659,7 +659,7 @@ app.post('/branch_location', async (req, res) => {
   try {
     const [results] = await db.query(`SELECT latitude,longitude,name_branch,id_branch
     FROM branch
-    WHERE ST_Distance_Sphere(POINT(branch.longitude,branch.latitude), POINT(?,?)) < 5000 and id_branch != 0 `, [req.body.longi, req.body.lati]);
+    WHERE ST_Distance_Sphere(POINT(branch.longitude,branch.latitude), POINT(?,?)) < 5000 and id_branch != 0 and delete_time IS NULL `, [req.body.longi, req.body.lati]);
     res.status(200).json({ 'success': true, results: results });
     console.log(results)
   } catch (error) {
@@ -667,6 +667,7 @@ app.post('/branch_location', async (req, res) => {
     res.status(500).json({ 'success': false, 'message': 'Internal server error' });
   }
 })
+
 
 
 app.post('/branch_data_car', async (req, res) => {
@@ -684,14 +685,22 @@ app.post('/branch_data_car', async (req, res) => {
   }
 })
 
-
-
+app.post('/addcomment', async (req, res) => {
+  try {
+    const [results_insert] = await db.query(`INSERT INTO report_problem(comment) VALUES (?) `,
+      [req.body.comment]);
+    res.send({ ok: true, data: results_insert });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ ok: false });
+  }
+});
 
 app.post('/add_use_washcar', async (req, res) => {
-
+  console.log("dssadewewewe5")
   try {
     if (req.body.check_send_data == 1) {
-      console.log(req.body.price)
+      // console.log(req.body.price)
       // const [results_credit] = await db.query(`select * from credit where  status = 1  `);
       const [results_customer] = await db.query(`select * from customer where  username =  ? `, [req.body.email_cus]);
       console.log(results_customer[0].money)
@@ -715,12 +724,18 @@ app.post('/add_use_washcar', async (req, res) => {
         console.log("Water:", data_ref_water);
         if (results_carwash[0].status == 0 || data_ref_foam == 0 || data_ref_water == 0) {
           res.send({ ok: false, txt: "box" });
+          console.log("dsd")
         } else {
+
+          // ลองตรงนี้
+          const [results_up] = await db.query(`UPDATE car_wash SET status = 2   where  car_name = ? and delete_time IS NULL`,
+            ["box" +req.body.car_idname]);
+          console.log(results_up)
+          console.log("/box" +req.body.car_idname)
+          // 
           db_fb.ref(txt).set(parseFloat(results_customer[0].money) + parseFloat(req.body.credit_free)).then(() => {
             db_fb.ref("/box" + req.body.car_idname + "/new_state").set(1).then(() => {
-              console.log("sadsd")
               db_fb.ref("/box" + req.body.car_idname + "/working_now").set(0).then(() => {
-                console.log("sads44444d")
                 res.send({ ok: true, data: results_customer });
               }).catch((error) => {
                 res.send({ ok: false, txt: "box" });
@@ -831,6 +846,11 @@ app.post('/send_use_carwash', async (req, res) => {
       const [results_up] = await db.query(`UPDATE customer SET money = ?   where  username = ? and delete_time IS NULL`,
         [req.body.balance, req.body.email_cus]);
 
+      const [results_up_car] = await db.query(`UPDATE car_wash SET status = 1   where  car_name = ? and delete_time IS NULL`,
+        ["box" +req.body.id_car]);
+
+
+
       let txt = "/box" + req.body.id_car + "/credit_balance"
       db_fb.ref(txt).set(0).then(() => {
         db_fb.ref("/box" + req.body.id_car + "/working_now").set(0).then(() => {
@@ -860,7 +880,6 @@ app.post('/send_use_carwash', async (req, res) => {
   }
 });
 
-
 app.post('/end_use_carwash', async (req, res) => {
   try {
     if (req.body.status_check == 1) {
@@ -869,6 +888,10 @@ app.post('/end_use_carwash', async (req, res) => {
           [0, req.body.promotion, req.body.email_cus, req.body.id_car, 1]);
       }
       console.log("dsadasddas")
+
+      const [results_up_car] = await db.query(`UPDATE car_wash SET status = 1   where  car_name = ? and delete_time IS NULL`,
+        ["box" +req.body.id_car]);
+
       let txt = "/box" + req.body.id_car + "/credit_balance"
       db_fb.ref(txt).set(0).then(() => {
         db_fb.ref("/box" + req.body.id_car + "/working_now").set(0).then(() => {
@@ -891,8 +914,24 @@ app.post('/end_use_carwash', async (req, res) => {
       }).catch((error) => {
         console.error('Error:', error);
       });
+    } else if (req.body.status_check == 2) {
+      console.log("สิิก")
+      let txt = "/box" + req.body.id_car + "/credit_balance"
+      db_fb.ref(txt).set(0).then(() => {
+        db_fb.ref(txt).set(0).then(() => {
+          res.send({ ok: true });
+        }).catch((error) => {
+          console.error('Error:', error);
+        });
+      }).catch((error) => {
+        console.error('Error:', error);
+      });
+
     }
+
+    // เซ็ตเป้น 0 ห้ได้
     // else {
+
     //   db_fb.ref("/box" + req.body.id_car + "/credit_balance").set(0).then(() => {
     //     res.send({ ok: true });
     //   }).catch((error) => {
